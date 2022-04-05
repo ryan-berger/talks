@@ -1,0 +1,184 @@
+# Genericizing Generics
+
+Ryan Berger
+Lead Go Developer, Sr. Wooly
+ryan@senorwooly.com
+https://ryanberger.me
+
+## About Me:
+- Senior at the University of Utah
+- I do research on formally verifying the ARM backend(s) of LLVM
+- I mentor a FIRST robotics team (Go ALChemists!)
+- Doing professional dev work for ~6 years now, ranging from Python/Android/Go/Flutter
+
+
+## Why Use Generics?
+- You want datastructures usable for any type
+- You don't want to repeat the same code for algorithms
+- You want to hide complexity of type assertions
+- You want the compiler to guarantee your paramters are only a subset of types
+
+
+## Generics: Implementation Strategies
+
+- Boxing/Type erasure (Java)
+- Monomorphization (C++, Go, Rust) (Code duplication)
+- Dynamic dispatch (C#, C++, Go) (Code duplciation w/ lookup tables)
+- Multiple dispatch (Julia)
+- Probably others that I forgot
+
+Many languages use multiple strategies to get the best compile/runtime performance.
+
+Monomorphization can create exponential increases compile time in some instances (i.e Rust)
+
+Boxing can create huge slow downs due to the need to typecast each time, but require little/no compiler overhead
+
+## Side note: Turing Completeness
+Turing completeness (simplified): Can your system implement another programming language?
+
+What things are turing complete?
+- Go programming language
+- C++'s templates
+- Rust's generics
+- Typescript's generics (almost?) 
+- Excel (as of 2021)
+- Powerpoint
+- Minecraft
+
+What things are not turing complete:
+- Go's generics
+
+
+## Go's Generics Implementation
+- Go has always had (some) generics!
+- []T, map[K]V, chan T
+
+## Go's Type Parameters 
+- Definitely not Turing complete
+- If the compiler can use monomorphization (code duplication) it does
+- If the compiler cannot do that it will use dynamic dispatch
+- Uses "reified" type constraints
+- Type inference mostly works
+
+
+## Monomorphization
+
+Monomorphization is essentially "copy pasting" implementations
+
+Go aggressively applies monomorphization, creating two instances of `max` for floats/ints
+```go
+type Num interface {
+	int | float64
+}
+
+func max[T Num](a T, b T) T {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func main() {
+	max(4, 7)
+	max(2.33, 99.88)
+}
+```
+
+## Monomorphization pt. 2
+
+If we can use `<` why can't we use `.`?
+
+.play test.go
+
+## Dynamic dispatch
+Really good article by PlanetScale discussing this
+
+Go's implementation of generics sometimes requires a lookup from a dictionary when using generic constraings: an extra pointer dereference. (This is similar to C++ vtables however)
+
+When the type constraint is exact i.e passing a `io.Writer` in to  `Fun[T io.Writer]` then a funciton call to `runtime.assertI2I` is generated (Yuck!).
+
+This is because we need the underlying type in order to get to the function's address.
+
+More aggressive compiler optimization should be able to fix this in some cases
+
+## Reification:
+
+This works in Go (C# too!); the type is essentially an argument
+```go
+type Foo interface {
+	string | int
+}
+
+func Bar[T Foo](param interface{}) bool {
+	_, isFoo := param.(T)
+	return foo
+}
+```
+
+This doesn't work in kotlin/Java. You need the `reified` keyword in Kotlin
+and you can't do this in Java.
+```kotlin
+fun genericFun<T>(param: Object): Boolean {
+	return (param is T) // error, type is eraised
+}
+```
+
+## Type inference
+
+Type inference can be super nasty.
+
+Go makes it simple: when it decides it is too hard, do this yourself.
+
+```go
+package main
+
+type S struct {}
+
+func (S) M() byte {
+	return 0
+}
+
+type I[T any] interface {
+	M() T
+}
+
+func F[X I[T], T any](x X) {
+	x.M()
+}
+
+func main() {
+	F(S{})          // fails inference
+	F[S, byte](S{}) // passes inference
+}
+```
+
+
+## Compiler Corner: What's With The [] ?
+
+Well, it comes down to parse ambiguity. (It's the commas fault!)
+
+- Compiler developers want to to do as much work as possible in fewest passes as possible
+- Checking type information during parse steps is not possible, add a new step!
+
+Multiple assigment:
+
+```go
+arr := []int {1, 2, 3}
+arr[0], arr[1] = arr[1], arr[0]
+```
+
+Scary multiple assignment with angle brackets:
+```go
+a, b = w < x, y > (z) // could be w<x, y> (z) or (w < x), y > (z)
+```
+
+Poof! Ambiguity gone!
+```go
+a, b = w [ x, y ] z // w[x, y]z is most definitely not valid
+```
+
+## Takeaways
+
+- Be careful with your generics
+- Don't be too cautious with your generics
+ 
