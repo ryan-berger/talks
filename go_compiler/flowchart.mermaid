@@ -1,0 +1,12 @@
+flowchart LR
+    A[Text] -->|Lexer| B[Tokens]
+    B -->|Parser| C[AST]
+    C -->|Typechecker| H[typed AST]
+    H -->|IR Generator| D[Intermediate Represntation/IR]
+    D -->|Optimization| D
+    D --> E[Object File/Assembly]
+
+    F[Object File] -->|Linker| G[Executable]
+
+
+

@@ -1,0 +1,58 @@
+# From Source to Binary: How Go Optimizes Your Code
+
+Ryan Berger
+Go and Compiler Enthusiast
+https://ryanberger.me
+
+## History of Compiler Innovations
+- Assemblers
+- FORTRAN (static/optimizing)
+- LISP (dynamic)
+- C (portable, good for systems)
+- IR - Single Static Assignment
+
+
+## Inside of a Compiler
+
+- Lexer: Text -> Tokens
+- Parser: Tokens -> AST
+- Type Checker: AST -> Typed AST
+- "Noder": Typed AST -> IR
+- Optimizer: IR -> IR
+- Code generator: IR -> Target Backend
+
+## The Optimizer
+
+Strength Reduction
+```go
+x := y / 32
+=>
+x := y >> 5
+```
+
+Constant Fold
+```go
+d := time.Second * 30
+=>
+x := 300000000
+```
+
+Dead Code
+```go
+if x > y && x < y {
+   panic("")
+}
+panic("")
+return 1, 2
+```
+
+## GiNN (Go is Never Normal)
+- `go/ast` and `go/types` are not used by the Go team
+- IR/Backend code generation is essentially the same thing
+- SSA-based IR was only introduced around Go 1.8
+- Go analysis passes must be very, very fast
+
+
+
+
+
