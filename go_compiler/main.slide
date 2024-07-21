@@ -21,6 +21,12 @@ https://ryanberger.me
 - Optimizer: IR -> IR
 - Code generator: IR -> Target Backend
 
+## GiNN (Go is Never Normal)
+- `go/ast` and `go/types` are not used by the Go team
+- IR/Backend code generation is essentially the same thing
+- SSA-based IR was only introduced around Go 1.8
+- Go analysis passes must be very, very fast
+
 ## The Optimizer
 
 Strength Reduction
@@ -46,11 +52,21 @@ panic("")
 return 1, 2
 ```
 
-## GiNN (Go is Never Normal)
-- `go/ast` and `go/types` are not used by the Go team
-- IR/Backend code generation is essentially the same thing
-- SSA-based IR was only introduced around Go 1.8
-- Go analysis passes must be very, very fast
+And More!
+
+## Code Generator
+
+Lower specific Go operations to more platform specific operations
+
+Shift and Add:
+```
+x := y + (z << a)
+=>
+     x   y   z   << a
+ADDW W1, W2, W3, lsl A
+```
+
+
 
 
 
