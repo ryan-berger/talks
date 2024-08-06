@@ -6,16 +6,21 @@ https://ryanberger.me
 
 ## The Invariant
 
+A property about a program that doesn't change
+
 .play division.go /START OMIT/,/END OMIT/
 
+## Problems They Solve
 
-## Sorts of Invariants
-- Datastructure
+- Commenting code and documentation
+- Preventing data corruption
+- Proof by code
+- Debugging (asserts)
+- Performance
 
-> Binary Tree: The height of the left and right tree for any node does not differ by more than 1.
+## Enforcement
 
-- Control Flow 
-
+- Control flow
 > ```
 > if condition {
 >     return thing
@@ -23,40 +28,75 @@ https://ryanberger.me
 > // !condition must hold
 > ```
 
-## Steps To Be a Better Programmer
+- Number Theory
+> `abs()`, `%`, two's complement etc. 
 
-- Identifying actual/potential invariants in code and datastructures
-- Enforcing invariants
+- Synchronization
+> ```
+> mu.Lock()
+> counter++
+> mu.Unlock()
 
+## Being Invariant Aware
 
+- Understanding the set of all inputs and outputs
+- Understanding _how_ to restrict the problem space
+- Finding tradeoffs associated with lazy/eager enforcement
 
 ## Performance
 
 Teach the compiler what is up
 
-.play performance-bad.go /START OMIT/,/END OMIT/
+.code performance-bad.go /START OMIT/,/END OMIT/
 
-## Performance pt. 2
+## Performing
 
-.play performance-good.go /START OMIT/,/END OMIT/
+.code performance-good.go /START OMIT/,/END OMIT/
 
 ## Correctness
 
 Invariant enforcement is proving to the code reviewer and to yourself 
 
+.code binary-bad.go /START BB OMIT/,/END BB OMIT/
 
+## Corrected
 
+.code binary-bad.go /START BG OMIT/,/END BG OMIT/
 
 ## Simplicity
 
 Invariant enforcment creates simple, straight-forward code
 
-.play simple.go /START OMIT/,/END OMIT/
+.code simple.go /START OMIT/,/END OMIT/
 
-## Practice Makes Perfect
+## Simpler
 
-Need to be able to name what is true of the state of a program at any given time
+.code simple.go /START IB OMIT/,/END IB OMIT/
 
-Generate potential ideas for enforcing invariants 
+## Datastructure
 
+.code datastructure.go /START INTRO OMIT/,/END INTRO OMIT/
 
+## Datastructured
+
+.code datastructure.go /START BETTER OMIT/,/END BETTER OMIT/
+
+## Synchronization
+
+Telling your reviewer that X happens before Y
+
+Thread1
+```
+mu.Lock()
+counter++
+mu.Unlock()
+```
+
+Thread2
+```
+mu.Lock()
+// Any value read by counter must have been a culmination
+// of increments that _happened before_ the read due to the mu.Lock
+fmt.Println(counter)
+mu.Unlock()
+```
