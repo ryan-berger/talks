@@ -1,0 +1,62 @@
+# Invariant Aware Programming
+
+Ryan Berger
+Software Corectness Enthusiast
+https://ryanberger.me
+
+## The Invariant
+
+.play division.go /START OMIT/,/END OMIT/
+
+
+## Sorts of Invariants
+- Datastructure
+
+> Binary Tree: The height of the left and right tree for any node does not differ by more than 1.
+
+- Control Flow 
+
+> ```
+> if condition {
+>     return thing
+> }
+> // !condition must hold
+> ```
+
+## Steps To Be a Better Programmer
+
+- Identifying actual/potential invariants in code and datastructures
+- Enforcing invariants
+
+
+
+## Performance
+
+Teach the compiler what is up
+
+.play performance-bad.go /START OMIT/,/END OMIT/
+
+## Performance pt. 2
+
+.play performance-good.go /START OMIT/,/END OMIT/
+
+## Correctness
+
+Invariant enforcement is proving to the code reviewer and to yourself 
+
+
+
+
+## Simplicity
+
+Invariant enforcment creates simple, straight-forward code
+
+.play simple.go /START OMIT/,/END OMIT/
+
+## Practice Makes Perfect
+
+Need to be able to name what is true of the state of a program at any given time
+
+Generate potential ideas for enforcing invariants 
+
+
